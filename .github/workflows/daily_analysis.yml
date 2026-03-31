@@ -295,3 +295,16 @@ jobs:
             echo "📜 最近日志（最后 30 行）:"
             tail -30 logs/stock_analysis_*.log 2>/dev/null || echo "无日志"
           fi
+
+      - name: 构建 GitHub Pages 静态报告
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          python scripts/build_github_pages.py --output-dir ./gh-pages-content
+
+      - name: 部署到 GitHub Pages
+        if: success() && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh-pages-content
+          keep_files: true
